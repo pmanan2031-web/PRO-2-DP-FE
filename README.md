@@ -1,237 +1,200 @@
-# PRO-2-DP-FE
-📊 Data Cleanser Project
-📌 Overview
+Healthcare Data Preprocessing & Feature Engineering Project
 
-This project demonstrates a complete Data Cleaning Pipeline using Python, Pandas, NumPy, and Scikit-Learn. The notebook covers handling missing values, detecting and treating outliers, and generating a final machine-learning-ready dataset.
+A complete Data Preprocessing project implemented in Python using Pandas, NumPy, Scikit-Learn, and Matplotlib.
 
-🎯 Objectives
-Identify and analyze missing values.
-Apply multiple imputation techniques.
-Detect outliers using statistical methods.
-Handle outliers using suitable treatments.
-Compare data quality before and after cleaning.
-Generate a final clean dataset.
+This project demonstrates:
+
+✅ Missing Value Handling
+✅ KNN Imputation
+✅ Iterative (MICE) Imputation
+✅ Outlier Detection
+✅ Outlier Treatment
+✅ Winsorization
+✅ Data Cleaning
+✅ Final Dataset Creation
+✅ Visualization
+
+📌 Project Overview
+
+Real-world healthcare datasets often contain:
+
+Missing values
+Incorrect entries
+Extreme outliers
+Data inconsistencies
+
+This project applies multiple preprocessing techniques to create a clean and model-ready dataset.
+
+📂 Project Structure
+project/
+│
+├── project.2.ipynb
+├── final_clean_dataset.csv
+├── README.md
+│
+├── screenshots/
+│   ├── missing_values.png
+│   ├── median_imputation.png
+│   ├── mode_imputation.png
+│   ├── knn_imputation.png
+│   ├── mice_imputation.png
+│   ├── zscore_outliers.png
+│   ├── iqr_outliers.png
+│   ├── winsorization.png
+│   └── boxplot.png
+│
+└── requirements.txt
+📊 Dataset Information
+
+The healthcare dataset contains:
+
+Column	Description
+patient_id	Unique Patient ID
+age	Patient Age
+gender	Male/Female
+bmi	Body Mass Index
+cholesterol	Cholesterol Level
+region	Patient Region
 🛠 Technologies Used
-Python 3
+Python
 Pandas
 NumPy
 Matplotlib
 Scikit-Learn
 SciPy
 Jupyter Notebook
-📂 Dataset Information
+🚀 Installation
 
-The project uses a healthcare dataset containing:
+Clone repository:
 
-Column
-patient_id
-age
-gender
-bmi
-cholesterol
-region
-insurance_claim
+git clone https://github.com/yourusername/healthcare-data-preprocessing.git
 
-The dataset intentionally contains:
+Move into project folder:
 
-Missing values
-Outliers
-Mixed data types
-Part A: Missing Value Handling
-1️⃣ Missing Value Analysis
+cd healthcare-data-preprocessing
 
-The project first identifies missing values and calculates their percentage.
+Install dependencies:
 
-missing_values = df.isnull().sum()
-missing_percentage = (df.isnull().sum()/len(df))*100
+pip install pandas numpy matplotlib scipy scikit-learn
+📋 Part A – Missing Value Handling
+Step 1: Load Dataset
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame(data)
 Output
-Total missing values per column
-Missing value percentage
-2️⃣ Median Imputation
+Dataset Loaded Successfully
+Shape: (10, 6)
 
-Used for numerical columns such as BMI.
 
-SimpleImputer(strategy="median")
-Why Median?
-Robust against outliers
-Preserves distribution better than mean
-3️⃣ Mode Imputation
+Step 2: Missing Value Analysis
+df.isnull().sum()
+Output
+Column	Missing Values
+bmi	2
+gender	1
+region	1
 
-Used for categorical columns:
+Step 3: Median Imputation
+median_imputer = SimpleImputer(strategy="median")
+Output
+Missing BMI values replaced by median value.
 
-Gender
-Region
-SimpleImputer(strategy="most_frequent")
-Why Mode?
-Replaces missing values with the most common category.
-4️⃣ Random Sample Imputation
+Step 4: Mode Imputation
+mode_imputer = SimpleImputer(strategy="most_frequent")
+Output
+Missing Gender and Region values replaced.
 
-Missing BMI values are replaced using randomly selected existing values.
+Step 5: Random Sample Imputation
+random_sample = df["bmi"].dropna().sample()
+Output
+Random values used to fill missing BMI entries.
 
-Benefits
-Preserves data distribution.
-Introduces less bias than mean/median in some cases.
-5️⃣ KNN Imputation
-KNNImputer(n_neighbors=5)
-How It Works
-Finds nearest neighbors.
-Uses neighboring values to estimate missing entries.
-Advantages
-Considers relationships between variables.
-Better for multivariate datasets.
-6️⃣ MICE (Iterative Imputation)
-IterativeImputer()
-How It Works
-Predicts missing values using other features.
-Repeats the process iteratively.
-Advantages
-Produces highly accurate imputations.
-Suitable for complex datasets.
-Part B: Outlier Handling
-1️⃣ Z-Score Method
-zscore(df["cholesterol"])
-Purpose
 
-Detect extreme observations based on standard deviations.
+Step 6: KNN Imputation
+from sklearn.impute import KNNImputer
+Output
+Missing numerical values estimated using nearest neighbors.
 
+Step 7: MICE Imputation
+from sklearn.impute import IterativeImputer
+Output
+Missing values predicted iteratively.
+
+📋 Part B – Outlier Detection
+Step 1: Z-Score Method
+from scipy.stats import zscore
+Output
+Outliers detected using Z-score.
 Formula
-Z=
-σ
-X−μ
-	​
+Z = (X - Mean) / Standard Deviation
 
-
-Outliers are identified when:
-
-|Z| > 3
-2️⃣ IQR Method
+Step 2: IQR Method
+Q1 = df["bmi"].quantile(0.25)
+Q3 = df["bmi"].quantile(0.75)
+Formula
 IQR = Q3 - Q1
+Output
+BMI outliers identified successfully.
 
-Lower Bound:
-
-Q1 - 1.5 × IQR
-
-Upper Bound:
-
-Q3 + 1.5 × IQR
-Benefits
-Resistant to skewed data.
-Works well with non-normal distributions.
-3️⃣ Percentile Capping
+Step 3: Percentile Capping
 lower = df["bmi"].quantile(0.01)
 upper = df["bmi"].quantile(0.99)
-Purpose
+Output
+Extreme BMI values capped.
 
-Caps extreme values at selected percentiles.
 
-Benefits
-Retains all records.
-Reduces influence of outliers.
-4️⃣ Winsorization
-winsorize(df["bmi"], limits=[0.01,0.01])
-Purpose
+Step 4: Winsorization
+winsorize(df["bmi"])
+Output
+Outliers replaced with boundary values.
 
-Replace extreme values with nearest acceptable values.
-
-Benefits
-Keeps dataset size unchanged.
-Maintains statistical stability.
-5️⃣ Outlier Removal
+Step 5: Outlier Removal
 df_clean = df[
-    (df["bmi"] >= lower) &
-    (df["bmi"] <= upper)
+(df["bmi"] >= lower) &
+(df["bmi"] <= upper)
 ]
-Purpose
-
-Remove observations outside accepted range.
-
-6️⃣ Visualization
-
-Boxplots are used to compare:
-
-Before Outlier Treatment
-After Outlier Treatment
+Output
+Before Shape : (10,6)
+After Shape  : (9,6)
+📈 Visualization
+BMI Before Treatment
 df.boxplot(column="bmi")
-Part C: Final Clean Dataset
-Final Dataset Checks
-Missing Values
-df.isnull().sum()
 
-Expected Result:
+BMI After Treatment
+df_clean.boxplot(column="bmi")
 
-All columns contain 0 missing values.
-Outlier Verification
+📋 Final Dataset
+df.to_csv("final_clean_dataset.csv")
+Output
+Final Clean Dataset Saved Successfully
 
-The dataset is rechecked after treatment to ensure extreme values are handled.
-
-Save Final Dataset
-df.to_csv("final_clean_dataset.csv", index=False)
-📈 Results
-Missing Value Handling
-Method	Applied To
-Median Imputation	BMI
-Mode Imputation	Gender, Region
-Random Sampling	BMI
-KNN Imputation	Numerical Features
-MICE Imputation	Numerical Features
-Outlier Treatment
-Method	Feature
-Z-Score	Cholesterol
-IQR	BMI
-Percentile Capping	BMI
-Winsorization	BMI
-Outlier Removal	BMI
-📝 Brief Report
-Missing Value Strategy
-
-Median and Mode imputation provided stable results while preserving the dataset structure.
-
-KNN and MICE offered more advanced imputations by considering relationships between variables.
-
-Outlier Handling Strategy
-
-Winsorization and Percentile Capping preserved all observations while reducing the influence of extreme values.
-
-The IQR method effectively detected abnormal BMI values.
-
-Dataset Improvement
-
-✅ Missing values removed
-
-✅ Outliers controlled
-
-✅ Improved consistency
-
-✅ Better data quality
-
-✅ Machine Learning Ready Dataset
-
-📸 Suggested Screenshots for README
-
-Add screenshots of:
-
-Dataset Overview
-Missing Value Summary
-Median Imputation Output
-KNN Imputation Output
-MICE Imputation Output
-Z-Score Outlier Detection
-IQR Detection
-Winsorization Results
-Before vs After Boxplot
-Final Clean Dataset
-🚀 Run the Project
-pip install pandas numpy matplotlib scipy scikit-learn
-jupyter notebook
-
-Open:
-
-project.2.ipynb
-
-and run all cells.
-
+📊 Results Summary
+Task	Status
+Missing Value Detection	✅
+Median Imputation	✅
+Mode Imputation	✅
+Random Imputation	✅
+KNN Imputation	✅
+MICE Imputation	✅
+Z-Score Outlier Detection	✅
+IQR Outlier Detection	✅
+Winsorization	✅
+Outlier Removal	✅
+Visualization	✅
+Final Dataset Creation	✅
+🎯 Key Learnings
+Handling Missing Values
+Statistical Imputation Techniques
+KNN Imputation
+MICE Imputation
+Z-Score Analysis
+IQR Method
+Winsorization
+Outlier Removal
+Data Cleaning Pipeline
 👨‍💻 Author
 
-Manan
+Manan Patel
 
-Data Cleaning & Feature Engineering Project using Python and Machine Learning preprocessing techniques.
+Data Preprocessing & Feature Engineering Lab Project
